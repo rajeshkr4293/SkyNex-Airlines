@@ -1,0 +1,13 @@
+server:
+  port: 8761  # 🔹 Eureka default port
+
+spring:
+  application:
+    name: service-registry
+
+eureka:
+  client:
+    register-with-eureka: false   # This service should not register itself
+    fetch-registry: false         # It is the registry itself
+  server:
+    enable-self-preservation: false  # Optional, for local testing
