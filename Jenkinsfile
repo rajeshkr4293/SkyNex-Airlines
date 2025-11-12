@@ -2,47 +2,45 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_REPO = 'skynex'     // change this if you push to DockerHub later
+        DOCKER_HUB_REPO = 'skynex-airlines'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/rajeshkr4293/SkyNex-Airlines.git'
+                git branch: 'dev',
+                    url: 'https://github.com/rajeshkr4293/SkyNex-Airlines.git',
+                    credentialsId: 'github-token'
             }
         }
 
         stage('Build & Package Microservices') {
             steps {
-                script {
-                    echo "Building all SkyNex microservices..."
-                    def services = ['flight-service', 'booking-service', 'payment-service', 'user-service', 'config-server', 'service-registry', 'api-gateway', 'admin-server']
-                    for (service in services) {
-                        dir("${service}/${service}") {
-                            sh 'chmod +x mvnw'
-                            sh './mvnw clean package -DskipTests'
-                        }
-                    }
+                echo 'Building all SkyNex microservices...'
+                dir('flight-service/flight-service') {
+                    bat 'mvn clean package -DskipTests'
+                }
+                dir('booking-service/booking-service') {
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                script {
-                    def services = ['flight-service', 'booking-service', 'payment-service', 'user-service', 'config-server', 'service-registry', 'api-gateway', 'admin-server']
-                    for (service in services) {
-                        dir("${service}/${service}") {
-                            sh "docker build -t ${DOCKER_HUB_REPO}-${service}:latest -f Dockerfile ."
-                        }
-                    }
+                echo 'Building Docker images...'
+                dir('flight-service/flight-service') {
+                    bat 'docker build -t skynex-flight-service .'
+                }
+                dir('booking-service/booking-service') {
+                    bat 'docker build -t skynex-booking-service .'
                 }
             }
         }
 
         stage('Post-Build Summary') {
             steps {
-                echo '✅ All microservices built successfully!'
+                echo '✅ Build and Docker image creation completed successfully!'
             }
         }
     }
