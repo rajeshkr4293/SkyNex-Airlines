@@ -17,10 +17,12 @@ pipeline {
         stage('Build & Package Microservices') {
             steps {
                 echo 'Building all SkyNex microservices...'
+                // Flight service path
                 dir('flight-service/flight-service') {
                     bat 'mvn clean package -DskipTests'
                 }
-                dir('booking-service/booking-service') {
+                // Booking service path corrected
+                dir('booking-service') {
                     bat 'mvn clean package -DskipTests'
                 }
             }
@@ -29,10 +31,12 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo 'Building Docker images...'
+                // Flight service Docker image
                 dir('flight-service/flight-service') {
                     bat 'docker build -t skynex-flight-service .'
                 }
-                dir('booking-service/booking-service') {
+                // Booking service Docker image path corrected
+                dir('booking-service') {
                     bat 'docker build -t skynex-booking-service .'
                 }
             }
